@@ -5,6 +5,8 @@
 #'
 #' @param data_vector   an atomic vector of type character, integer, double, or logical
 #' @param sort_by_count   boolean value that determines if output will be sorted by count or name
+#' @param round   an integer value that determines the number of decimal places displayed
+#' @param miss_row   a boolean value that determines if the NA row is displayed
 #' @param total_row   a boolean value that determines if the output will have a summary row appended
 #'
 #' @return a data_frame containing the counts and percentages of each value from the provided data
@@ -26,7 +28,7 @@
 #' freq_vect(tbl$letters, sort_by_count = TRUE, total_row = FALSE)
 #' freq_vect(mtcars$cyl)
 
-freq_vect <- function(data_vector, sort_by_count = FALSE, total_row = TRUE) {
+freq_vect2 <- function(data_vector, sort_by_count = FALSE, round = 1, miss_row = TRUE, total_row = TRUE) {
 
   # To prevent NOTE from R CMD check 'no visible binding for global variable'
   data = n = total = Percentage = Cum. = NULL
@@ -47,29 +49,33 @@ freq_vect <- function(data_vector, sort_by_count = FALSE, total_row = TRUE) {
 
   df <- data.frame(data = data_vector, stringsAsFactors = FALSE)
 
-  result <- dplyr::count(df, data) %>%
+  result <- dplyr::count(df, data)
+
+  if (!is.logical(miss_row)) miss_row <- TRUE
+  if (miss_row == FALSE) {
+    result <- dplyr::filter(result, data != "<NA>")
+  }
+
+  result <- result %>%
     dplyr::mutate(total = sum(n)) %>%
     dplyr::group_by(data) %>%
-    dplyr::mutate(Percentage = round(n * 100 / total, 1)) %>%
+    dplyr::mutate(Percentage = formatC(n * 100 / total, digits = round, format = "f")) %>%
     dplyr::ungroup() %>%
     dplyr::arrange_(sort_by) %>%
     dplyr::mutate(Cum. = cumsum(Percentage)) %>%
+    dplyr::mutate(Cum. = ifelse(Cum. > 100, round(Cum., 0), Cum.)) %>%
+    dplyr::mutate(Cum. = formatC(Cum., digits = round, format = "f")) %>%
     dplyr::select(data,
-                   Count = n,
-                   Percentage,
-                   Cum.)
-
+                  Count = n,
+                  Percentage,
+                  Cum.)
 
   if (!is.logical(total_row)) total_row <- TRUE
   if (total_row) {
+    x <- formatC(100, digits = round, format = "f")
     result[,1] <- lapply(result[,1], as.character)
-    result <- rbind.data.frame(result,c('Total', sum(result$Count), 100, 100))
+    result <- rbind.data.frame(result,c('Total', sum(result$Count), x, ""))
   }
 
   return(result)
 }
-
-
-
-
-

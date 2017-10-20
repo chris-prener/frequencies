@@ -4,12 +4,17 @@
 \alias{freq_vect}
 \title{freq_vect}
 \usage{
-freq_vect(data_vector, sort_by_count = FALSE, total_row = TRUE)
+freq_vect(data_vector, sort_by_count = FALSE, round = 2, miss_row = TRUE,
+  total_row = TRUE)
 }
 \arguments{
 \item{data_vector}{an atomic vector of type character, integer, double, or logical}
 
 \item{sort_by_count}{boolean value that determines if output will be sorted by count or name}
+
+\item{round}{an integer value that determines the number of decimal places displayed}
+
+\item{miss_row}{a boolean value that determines if the NA row is displayed}
 
 \item{total_row}{a boolean value that determines if the output will have a summary row appended}
 }
