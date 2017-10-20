@@ -28,7 +28,7 @@
 #' freq_vect(tbl$letters, sort_by_count = TRUE, total_row = FALSE)
 #' freq_vect(mtcars$cyl)
 
-freq_vect2 <- function(data_vector, sort_by_count = FALSE, round = 1, miss_row = TRUE, total_row = TRUE) {
+freq_vect <- function(data_vector, sort_by_count = FALSE, round = 1, miss_row = TRUE, total_row = TRUE) {
 
   # To prevent NOTE from R CMD check 'no visible binding for global variable'
   data = n = total = Percentage = Cum. = NULL
